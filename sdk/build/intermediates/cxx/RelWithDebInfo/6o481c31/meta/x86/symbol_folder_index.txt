@@ -1,0 +1,1 @@
+C:\Users\oluwa\AndroidStudioProjects\HandwritingToTextConverter\sdk\build\intermediates\cxx\RelWithDebInfo\6o481c31\obj\x86

@@ -1,0 +1,1 @@
+C:\Users\oluwa\AndroidStudioProjects\HandwritingToTextConverter\sdk\build\intermediates\cxx\Debug\6w3k1125\obj\x86_64

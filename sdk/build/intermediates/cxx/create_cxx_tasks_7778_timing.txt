@@ -1,0 +1,74 @@
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model 16ms
+create_cxx_tasks completed in 17ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model 17ms
+create_cxx_tasks completed in 18ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model
+    create-variant-model 35ms
+    create-ARM64_V8A-model 10ms
+    [gap of 36ms]
+    create-variant-model 46ms
+  create-initial-cxx-model completed in 143ms
+create_cxx_tasks completed in 144ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model 18ms
+create_cxx_tasks completed in 18ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model
+    create-variant-model 60ms
+    [gap of 22ms]
+    create-X86_64-model 25ms
+    create-module-model
+      [gap of 10ms]
+      create-ndk-meta-abi-list 42ms
+      [gap of 26ms]
+    create-module-model completed in 78ms
+    [gap of 16ms]
+  create-initial-cxx-model completed in 207ms
+create_cxx_tasks completed in 209ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model 14ms
+create_cxx_tasks completed in 15ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model
+    create-module-model
+      create-cmake-model 18ms
+      [gap of 16ms]
+    create-module-model completed in 36ms
+    create-variant-model 33ms
+    create-ARM64_V8A-model 78ms
+    [gap of 27ms]
+  create-initial-cxx-model completed in 179ms
+create_cxx_tasks completed in 181ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model 17ms
+create_cxx_tasks completed in 18ms
+
+# C/C++ build system timings
+create_cxx_tasks
+  create-initial-cxx-model
+    create-module-model
+      create-cmake-model 66ms
+    create-module-model completed in 76ms
+    create-variant-model 71ms
+    [gap of 31ms]
+  create-initial-cxx-model completed in 178ms
+create_cxx_tasks completed in 180ms
+
