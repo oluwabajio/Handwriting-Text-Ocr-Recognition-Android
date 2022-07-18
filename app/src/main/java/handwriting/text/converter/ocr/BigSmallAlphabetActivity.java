@@ -58,7 +58,6 @@ public class BigSmallAlphabetActivity extends AppCompatActivity {
     private void initInterpreter() {
 
         // Load the TF Lite model
-
         try {
             ByteBuffer model = loadModelFile();
 
