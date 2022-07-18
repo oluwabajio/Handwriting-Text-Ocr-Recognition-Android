@@ -54,15 +54,14 @@ import handwriting.text.converter.ocr.databinding.ActivityMainWordsBinding;
 public class MainWordsActivity extends AppCompatActivity {
 
     ActivityMainWordsBinding binding;
-    private String MODEL_FILE = "alpharecognition.tflite";
     private String MAIN_MODEL_FILE = "emnist.tflite";
-     private int inputImageWidth = 0;
+    private int inputImageWidth = 0;
     private int inputImageHeight = 0;
     private int modelInputSize = 0;
     private boolean isInitialized = false;
     Interpreter interpreter = null;
     private static final String TAG = "DigitActivity";
-    String labelNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; //output is 52
+    String labelNames = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
     static {
@@ -83,7 +82,7 @@ public class MainWordsActivity extends AppCompatActivity {
 
         initViews();
         initListeners();
-       // initInterpreter();
+        // initInterpreter();
         initInterpreter2();
     }
 
@@ -111,7 +110,7 @@ public class MainWordsActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG, "initInterpreter: "+ e.getMessage() );
+            Log.e(TAG, "initInterpreter: " + e.getMessage());
         }
     }
 
@@ -167,15 +166,6 @@ public class MainWordsActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void processImage() {
         try {
-            // get input stream
-            InputStream ims = getAssets().open("hello_world.png");
-            // load image as Drawable
-            Drawable d = Drawable.createFromStream(ims, null);
-            // set image to ImageView
-            //  mImage.setImageDrawable(d);
-            ims.close();
-
-            //or
 
 
             InputStream istr = getAssets().open("hello_world.png");
@@ -191,6 +181,7 @@ public class MainWordsActivity extends AppCompatActivity {
             Bitmap bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true); //todo
             Utils.bitmapToMat(bmp32, src);  // or Mat src = Imgcodecs.imread(input);
 
+            Mat srcc = src.clone();
 
             //Creating the empty destination matrix
             Mat greyScaledImage = new Mat();
@@ -272,7 +263,7 @@ public class MainWordsActivity extends AppCompatActivity {
 //                    (tH, tW) = thresh.shape
                     Mat croppedImageThreshold = new Mat();
                     Imgproc.threshold(croppedImage, croppedImageThreshold, 0, 255, Imgproc.THRESH_BINARY_INV | Imgproc.THRESH_OTSU);
-                   // displayROI(croppedImageThreshold);
+                    // displayROI(croppedImageThreshold);
                     Log.e(TAG, "processImage: Size of threshold = width " + croppedImageThreshold.width() + " height  = " + croppedImageThreshold.height());
 
 
@@ -289,25 +280,25 @@ public class MainWordsActivity extends AppCompatActivity {
                     if (croppedImageThreshold.width() > croppedImageThreshold.height()) {
 //                          # calculate the ratio of the width and construct the
 //        # dimensions
-                        float r = (float) 32 /(float) croppedImageThreshold.width();
+                        float r = (float) 32 / (float) croppedImageThreshold.width();
 //                        dim = (width, int(h * r))
                         Size size = new Size(32, croppedImageThreshold.height() * r);
 //                                resized = cv2.resize(image, dim, interpolation = inter)
-                        Imgproc.resize(croppedImageThreshold, croppedImageThresholdResized, size );
+                        Imgproc.resize(croppedImageThreshold, croppedImageThresholdResized, size);
                     } else {
 //                          # calculate the ratio of the width and construct the
 //        # dimensions
                         float r = (float) 32 / (float) croppedImageThreshold.height();
-                        Log.e(TAG, "processImage: --r = " + r + "   --cith = "+ croppedImageThreshold.height() );
+                        Log.e(TAG, "processImage: --r = " + r + "   --cith = " + croppedImageThreshold.height());
 //                        dim = (width, int(h * r))
                         Size size = new Size(croppedImageThreshold.width() * r, 32);
 //                                resized = cv2.resize(image, dim, interpolation = inter)
-                        Log.e(TAG, "processImage: --w = " + size.width + "   --h = "+ size.height );
+                        Log.e(TAG, "processImage: --w = " + size.width + "   --h = " + size.height);
                         Imgproc.resize(croppedImageThreshold, croppedImageThresholdResized, size);
                     }
                     Log.e(TAG, "processImage: new Resized Size is = width " + croppedImageThresholdResized.width() + " height  = " + croppedImageThresholdResized.height());
 
-                    displayROI(croppedImageThresholdResized);
+                    //    displayROI(croppedImageThresholdResized);
 
 //
 //		# re-grab the image dimensions (now that its been resized)
@@ -318,11 +309,9 @@ public class MainWordsActivity extends AppCompatActivity {
 //                    dY = int(max(0, 32 - tH) / 2.0)
 
 
-
-                        Size sizeb = croppedImageThresholdResized.size();
-                        int dX =  (int) (max(0, 32-sizeb.width)/2.0);
-                        int dY =  (int) (max(0, 32-sizeb.height)/2.0);
-
+                    Size sizeb = croppedImageThresholdResized.size();
+                    int dX = (int) (max(0, 32 - sizeb.width) / 2.0);
+                    int dY = (int) (max(0, 32 - sizeb.height) / 2.0);
 
 
 //
@@ -332,11 +321,30 @@ public class MainWordsActivity extends AppCompatActivity {
 //                            value=(0, 0, 0))
 //                    padded = cv2.resize(padded, (32, 32))
                     Mat croppedImageThresholdResizedPadded = new Mat();
-                    Core.copyMakeBorder(croppedImageThresholdResized, croppedImageThresholdResizedPadded, dY, dY, dX, dX, Core.BORDER_CONSTANT, new Scalar(0,0,0));
+                    Core.copyMakeBorder(croppedImageThresholdResized, croppedImageThresholdResizedPadded, dY, dY, dX, dX, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
                     Imgproc.resize(croppedImageThresholdResizedPadded, croppedImageThresholdResizedPadded, new Size(32, 32));
                     Log.e(TAG, "processImage: final Resized Size is = width " + croppedImageThresholdResizedPadded.width() + " height  = " + croppedImageThresholdResizedPadded.height());
-displayROI(croppedImageThresholdResizedPadded);
-//
+                    //displayROI(croppedImageThresholdResizedPadded);
+
+
+                    //loge
+
+
+                    displayROI(croppedImageThresholdResizedPadded);
+                    char letter = classifyBitmap(getBitmap(croppedImageThresholdResizedPadded));
+                    Log.e(TAG, "processImage: RESULT = " + classifyDrawing(getBitmap(croppedImageThresholdResizedPadded)));
+
+
+                    //Draw rectangle for the detected countour on the original image
+//                    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+//                    cv2.putText(image, label, (x - 10, y - 10),
+//                            cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
+                    Imgproc.rectangle(srcc, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
+                            new Scalar(255, 0, 255, 0), 3);
+                    Imgproc.putText(srcc, ""+letter, new Point(rect.x -10, rect.y-10), Imgproc.FONT_HERSHEY_SIMPLEX, 1.2,
+                            new Scalar( 0, 255, 0), 3);
+
+
 //		# prepare the padded image for classification via our
 //		# handwriting OCR model
 //                            padded = padded.astype("float32") / 255.0
@@ -350,13 +358,16 @@ displayROI(croppedImageThresholdResizedPadded);
 
             }
 
+            Bitmap bmp = Bitmap.createBitmap(srcc.cols(), srcc.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(srcc, bmp);
+            binding.imgImage.setImageBitmap(bmp);
 
         } catch (IOException ex) {
             return;
         }
     }
 
-    private void displayROI(Mat croppedImage) {
+    private Bitmap displayROI(Mat croppedImage) {
         // create bitmap
         Bitmap bmp = null;
 // create a new 4 channel Mat because bitmap is ARGB
@@ -369,6 +380,22 @@ displayROI(croppedImageThresholdResizedPadded);
         Utils.matToBitmap(tmp, bmp);
 
         binding.imgImage.setImageBitmap(bmp);
+        return bmp;
+    }
+
+    private Bitmap getBitmap(Mat croppedImage) {
+        // create bitmap
+        Bitmap bmp = null;
+// create a new 4 channel Mat because bitmap is ARGB
+        Mat tmp = new Mat(croppedImage.rows(), croppedImage.cols(), CvType.CV_8U, new Scalar(4));
+// convert ROI image from single channel to 4 channel
+        Imgproc.cvtColor(croppedImage, tmp, Imgproc.COLOR_GRAY2RGBA, 4);
+// Initialize bitmap
+        bmp = Bitmap.createBitmap(croppedImage.cols(), croppedImage.rows(), Bitmap.Config.ARGB_8888);
+// convert Mat to bitmap
+        Utils.matToBitmap(tmp, bmp);
+
+        return bmp;
     }
 
     private void drawContour(Mat src, List<MatOfPoint> contours) {
@@ -417,36 +444,60 @@ displayROI(croppedImageThresholdResizedPadded);
         // Preprocessing: resize the input
         startTime = System.nanoTime();
         Bitmap resizedImage = Bitmap.createScaledBitmap(bitmap, inputImageWidth, inputImageHeight, true);
-        Bitmap btmp = resizedImage.copy(Bitmap.Config.ARGB_8888, true);
-
         ByteBuffer byteBuffer = convertBitmapToByteBuffer(resizedImage);
         elapsedTime = (System.nanoTime() - startTime) / 1000000;
         Log.e(TAG, "Preprocessing time = " + elapsedTime + "ms");
 
-
-        ImageProcessor imageProcessor =
-                new ImageProcessor.Builder()
-                        .add(new ResizeOp(inputImageHeight, inputImageWidth, ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
-                        .add(new CastOp(DataType.FLOAT32))
-                        .build();
-
-// Create a TensorImage object. This creates the tensor of the corresponding
-// tensor type (uint8 in this case) that the TensorFlow Lite interpreter needs.
-        TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
-
-// Analysis code for every frame
-// Preprocess the image
-        tensorImage.load(btmp);
-        tensorImage = imageProcessor.process(tensorImage);
-
-
         startTime = System.nanoTime();
-        float[][] result = new float[1][52]; // Array of size 1 because there is only 1 output. Size of output is 10, then it means the content of the array is of size 10
-        interpreter.run(tensorImage.getBuffer(), result);
+        float[][] result = new float[1][36]; // Array of size 1 because there is only 1 output. Size of output is 10, then it means the content of the array is of size 10
+        interpreter.run(byteBuffer, result);
         elapsedTime = (System.nanoTime() - startTime) / 1000000;
         Log.e(TAG, "Inference time = " + elapsedTime + "ms");
 
         return getOutputString(result[0]);
+    }
+
+    private char classifyBitmap(Bitmap bitmap) {
+        if (!isInitialized) {
+            throw new IllegalStateException("TF Lite Interpreter is not initialized yet.");
+        }
+
+        long startTime;
+        long elapsedTime;
+
+        // Preprocessing: resize the input
+        startTime = System.nanoTime();
+        Bitmap resizedImage = Bitmap.createScaledBitmap(bitmap, inputImageWidth, inputImageHeight, true);
+        ByteBuffer byteBuffer = convertBitmapToByteBuffer(resizedImage);
+        elapsedTime = (System.nanoTime() - startTime) / 1000000;
+        Log.e(TAG, "Preprocessing time = " + elapsedTime + "ms");
+
+        startTime = System.nanoTime();
+        float[][] result = new float[1][36]; // Array of size 1 because there is only 1 output. Size of output is 10, then it means the content of the array is of size 10
+        interpreter.run(byteBuffer, result);
+        elapsedTime = (System.nanoTime() - startTime) / 1000000;
+        Log.e(TAG, "Inference time = " + elapsedTime + "ms");
+
+        float[] array = result[0];
+        if (array.length <= 0)
+            throw new IllegalArgumentException("The array is empty");
+
+        int maxIndex = -1;
+        float maxResult = -1;
+        for (int i = 0; i < array.length; i++) {
+            Log.e(TAG, "getOutputString: char =  " + labelNames.charAt(i) + " value = " + array[i]);
+            if (array[i] > maxResult) {
+                maxResult = array[i];
+                maxIndex = i;
+
+            }
+        }
+
+        if (maxIndex == -1) {
+            return '-';
+        } else {
+            return  labelNames.charAt(maxIndex);
+        }
     }
 
 
@@ -481,10 +532,13 @@ displayROI(croppedImageThresholdResizedPadded);
             throw new IllegalArgumentException("The array is empty");
 
         int maxIndex = -1;
+        float maxResult = -1;
         for (int i = 0; i < array.length; i++) {
             Log.e(TAG, "getOutputString: char =  " + labelNames.charAt(i) + " value = " + array[i]);
-            if (array[i] > maxIndex) {
+            if (array[i] > maxResult) {
+                maxResult = array[i];
                 maxIndex = i;
+
             }
         }
 

@@ -19,22 +19,6 @@
             </intent-filter>
 
         </activity>
-        <activity
-            android:name=".BigSmallAlphabetActivity"
-            android:exported="true">
-
-        </activity>
-        <activity
-            android:name=".LettersActivity"
-            android:exported="true"></activity>
-        <activity
-            android:name=".DigitActivity"
-            android:exported="true"></activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.HandwritingToTextConverter.NoActionBar" />
     </application>
 
 </manifest>
